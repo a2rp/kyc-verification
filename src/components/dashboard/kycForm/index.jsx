@@ -386,6 +386,11 @@ const KycForm = forwardRef(function KycForm(
                     <Output>{JSON.stringify(submitted, null, 2)}</Output>
                 </Card>
             )}
+
+            {/* developer */}
+            <div style={{ margin: "15px 10px" }}>
+                Designed and developed by <a href="https://www.ashishranjan.net" target="_blank" style={{ color: "#fff" }}>https://www.ashishranjan.net</a>
+            </div>
         </form>
     );
 });
