@@ -1,5 +1,7 @@
 # KYC Verification
 
+![alt text](image-1.png)
+
 React-based KYC verification UI built with **styled-components**.
 Includes a multi-section form (Personal, Address, Document, Profile Photo) with
 
