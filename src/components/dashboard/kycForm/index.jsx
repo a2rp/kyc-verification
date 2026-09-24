@@ -10,6 +10,7 @@ import styled from "styled-components";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { toast } from "react-toastify";
+import { FiRefreshCw, FiSend } from "react-icons/fi";
 
 import { TextField, DropDown, FileField } from "./InputFields";
 import { formSchema } from "./validation";
@@ -63,7 +64,7 @@ const Grid3 = styled.div`
   @media (max-width: 820px){ grid-template-columns: 1fr; }
 `;
 const Row = styled.div` display:flex; gap:16px; `;
-const Buttons = styled.div` display:flex; gap:10px; margin-top:14px; `;
+const Buttons = styled.div` display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; `;
 const Button = styled.button`
   display:inline-flex; align-items:center; gap:8px;
   padding:10px 14px; border-radius:10px; border:1px solid var(--border);
@@ -87,7 +88,8 @@ const safeLoadDraft = () => {
     catch { return null; }
 };
 const saveDraft = (values) => {
-    const { profilePicture, ...rest } = values;
+    const rest = { ...values };
+    delete rest.profilePicture;
     localStorage.setItem(DRAFT_KEY, JSON.stringify(rest));
 };
 const clearDraft = () => localStorage.removeItem(DRAFT_KEY);
@@ -138,7 +140,7 @@ const KycForm = forwardRef(function KycForm(
         }
     }, [docType]);
 
-    const fakeApi = (formData) =>
+    const fakeApi = () =>
         new Promise((resolve, reject) => {
             setTimeout(() => {
                 if (apiMode === "success") return resolve({ ok: true });
@@ -161,9 +163,9 @@ const KycForm = forwardRef(function KycForm(
 
     const onSubmit = async (values) => {
         try {
-            const fd = toFormData(values);
-            await fakeApi(fd);
-            toast.success("KYC submitted successfully 🎉");
+            toFormData(values);
+            await fakeApi();
+            toast.success("KYC submitted successfully.");
             clearDraft();
 
             const file = values.profilePicture
@@ -371,9 +373,11 @@ const KycForm = forwardRef(function KycForm(
 
                 <Buttons>
                     <Button type="submit" disabled={isSubmitting}>
+                        <FiSend aria-hidden="true" />
                         {isSubmitting ? "Submitting..." : "Submit"}
                     </Button>
                     <DangerBtn type="button" onClick={onReset} disabled={isSubmitting}>
+                        <FiRefreshCw aria-hidden="true" />
                         Reset
                     </DangerBtn>
                 </Buttons>
@@ -382,15 +386,10 @@ const KycForm = forwardRef(function KycForm(
             {/* Debug output */}
             {submitted && (
                 <Card>
-                    <SectionTitle>Submitted Payload (debug)</SectionTitle>
+                    <SectionTitle>Submission Summary</SectionTitle>
                     <Output>{JSON.stringify(submitted, null, 2)}</Output>
                 </Card>
             )}
-
-            {/* developer */}
-            <div style={{ margin: "15px 10px" }}>
-                Designed and developed by <a href="https://www.ashishranjan.net" target="_blank" style={{ color: "#fff" }}>https://www.ashishranjan.net</a>
-            </div>
         </form>
     );
 });

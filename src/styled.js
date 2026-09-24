@@ -1,81 +1,153 @@
-// STEP 1B: Centralized styled-components for project-level layout
-// - We follow your preferred pattern: export const Styled = { Wrapper: styled.div`` };
-// - We also define CSS variables on the Wrapper (project theme).
-// - Only layout & global-ish primitives live here. Component-specific
-//   details can live next to the component, but we can move them here if you prefer.
-
 import styled, { createGlobalStyle } from "styled-components";
 
-// (Optional) A very light reset + base font
 export const GlobalStyle = createGlobalStyle`
-  /* STEP 1B.1: Tiny reset for consistent look */
-  *, *::before, *::after { box-sizing: border-box; }
-  html, body, #root { height: 100%; }
-  body { margin: 0; font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+    *, *::before, *::after {
+        box-sizing: border-box;
+    }
+
+    html {
+        min-width: 320px;
+        background: #07111f;
+    }
+
+    body {
+        margin: 0;
+        min-width: 320px;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #07111f;
+        color: #e7eef9;
+    }
+
+    button,
+    input,
+    select {
+        font: inherit;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible {
+        outline: 3px solid rgba(96, 165, 250, 0.45);
+        outline-offset: 2px;
+    }
 `;
 
-// The main app wrapper that hosts theme variables.
-// NOTE: We're setting variables on the wrapper (your preference), not :root.
 const Wrapper = styled.div`
-    /* STEP 1B.2: Project theme as CSS variables */
-    --bg: #0b0f1a;
-    --surface: #0f172a;
-    --surface-2: #111827;
-    --primary: #2563eb;
-    --secondary: #1e40af;
-    --text: #e5e7eb;
-    --muted: #94a3b8;
-    --border: #1f2937;
-    --success: #16a34a;
-    --danger: #ef4444;
+    --bg: #07111f;
+    --surface: #0d1a2b;
+    --surface-strong: #111f32;
+    --surface-soft: #15263c;
+    --primary: #60a5fa;
+    --primary-strong: #3b82f6;
+    --text: #e7eef9;
+    --muted: #91a5bf;
+    --border: #29415e;
+    --success: #34d399;
+    --danger: #fb7185;
 
-    min-height: 100%;
-    background: var(--bg);
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at 80% 0%, rgba(37, 99, 235, 0.13), transparent 30rem),
+        var(--bg);
     color: var(--text);
-    display: flex;
-    justify-content: center;
 `;
 
-// A centered container to keep content at a readable max-width
 const Main = styled.main`
     width: 100%;
-    max-width: 1440px;
+    max-width: 1600px;
+    min-height: 100vh;
+    margin: 0 auto;
     display: grid;
-    /* STEP 1B.3: Two-column layout: left menu (fixed width) + right content */
-    grid-template-columns: 280px 1fr;
-    gap: 0px;
+    grid-template-columns: 250px minmax(0, 1fr);
 `;
 
-// Left column: vertical nav. We'll make it sticky so it stays put while scrolling.
 const LeftCol = styled.aside`
     position: sticky;
     top: 0;
+    z-index: 20;
     align-self: start;
-    height: 100dvh; /* modern viewport unit (respects mobile UI) */
-    background: var(--surface);
+    height: 100vh;
+    overflow-y: auto;
+    background: rgba(9, 22, 37, 0.96);
     border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+
+    @media (max-width: 780px) {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: min(290px, 86vw);
+        transform: ${({ $menuOpen }) =>
+            $menuOpen ? "translateX(0)" : "translateX(-105%)"};
+        box-shadow: 20px 0 50px rgba(0, 0, 0, 0.35);
+    }
 `;
 
-// Right column: main dashboard area (header + content)
 const RightCol = styled.section`
-    min-height: 100dvh;
-    background: var(--surface-2);
-    display: flex;
-    flex-direction: column;
+    min-width: 0;
+    min-height: 100vh;
+    background: rgba(7, 17, 31, 0.8);
 `;
 
-// An inner padder for page sections
 const Section = styled.div`
-    padding: 24px 28px;
+    width: min(100%, 1180px);
+    margin: 0 auto;
+    padding: clamp(20px, 3vw, 42px);
 `;
 
-// We export this object per your pattern
+const Intro = styled.section`
+    margin-bottom: 22px;
+    padding: clamp(20px, 3vw, 30px);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background:
+        linear-gradient(135deg, rgba(59, 130, 246, 0.12), transparent 55%),
+        var(--surface);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.16);
+
+    .eyebrow {
+        margin: 0 0 8px;
+        color: var(--primary);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    h2 {
+        margin: 0 0 8px;
+        font-size: clamp(24px, 3vw, 34px);
+        line-height: 1.12;
+    }
+
+    p {
+        max-width: 720px;
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.7;
+    }
+`;
+
+const MobileOverlay = styled.button`
+    display: none;
+
+    @media (max-width: 780px) {
+        display: ${({ $open }) => ($open ? "block" : "none")};
+        position: fixed;
+        inset: 0;
+        z-index: 15;
+        border: 0;
+        background: rgba(1, 7, 16, 0.64);
+        cursor: pointer;
+    }
+`;
+
 export const Styled = {
     Wrapper,
     Main,
     LeftCol,
     RightCol,
     Section,
+    Intro,
+    MobileOverlay,
 };
