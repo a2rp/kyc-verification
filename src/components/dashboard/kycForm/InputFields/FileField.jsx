@@ -73,7 +73,7 @@ export default function FileField({
     const file = watch(name);
 
     const previewUrl = useMemo(() => {
-        if (!file) return null;
+        if (!file || file.size > 2 * 1024 * 1024 || !["image/jpeg", "image/png"].includes(file.type)) return null;
         return URL.createObjectURL(file);
     }, [file]);
 
@@ -109,7 +109,7 @@ export default function FileField({
 
             <Row>
                 {previewUrl && <Preview src={previewUrl} alt="Profile preview" />}
-                {file && <ClearBtn onClick={onClear}>Clear</ClearBtn>}
+                {file && <ClearBtn type="button" onClick={onClear}>Clear</ClearBtn>}
             </Row>
 
             {error && <Error>{error.message}</Error>}

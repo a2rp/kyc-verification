@@ -98,7 +98,7 @@ const MenuButton = styled(Button)`
 
 export default function Header({
     onVerify,
-    onDelete,
+    onReset,
     onMenuToggle,
     submitting = false,
 }) {
@@ -107,8 +107,8 @@ export default function Header({
             <Brand>
                 <img src={`${import.meta.env.BASE_URL}logo.png`} alt="KYC verification logo" />
                 <div>
-                    <small>Secure workspace</small>
-                    <Title>KYC Verification</Title>
+                    <small>Front-end demo</small>
+                    <Title>KYC Form Workflow</Title>
                 </div>
             </Brand>
 
@@ -125,19 +125,19 @@ export default function Header({
                     type="button"
                     onClick={onVerify}
                     disabled={submitting}
-                    title="Verify form"
+                    title="Validate demo form"
                 >
                     <VerifyIcon />
-                    <span>{submitting ? "Submitting..." : "Verify"}</span>
+                    <span>{submitting ? "Validating..." : "Validate demo"}</span>
                 </Button>
                 <Button
                     type="button"
-                    onClick={onDelete}
+                    onClick={onReset}
                     disabled={submitting}
-                    title="Clear form"
+                    title="Reset form"
                 >
                     <DeleteIcon />
-                    <span>Delete</span>
+                    <span>Reset</span>
                 </Button>
             </Actions>
         </Bar>

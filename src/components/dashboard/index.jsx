@@ -40,24 +40,26 @@ export default function Dashboard({ onMenuToggle }) {
     }, []);
 
     const handleVerify = () => kycRef.current?.submitForm();
-    const handleDelete = () => kycRef.current?.resetForm();
+    const handleReset = () => kycRef.current?.resetForm();
 
     return (
         <>
             <Header
                 onVerify={handleVerify}
-                onDelete={handleDelete}
+                onReset={handleReset}
                 onMenuToggle={onMenuToggle}
                 submitting={submitting}
             />
 
             <Styled.Section>
                 <Styled.Intro>
-                    <p className="eyebrow">Applicant review</p>
-                    <h2>Complete a careful KYC verification</h2>
+                    <p className="eyebrow">Form interface demo</p>
+                    <h2>Explore a KYC form workflow</h2>
                     <p>
-                        Capture personal, address, document, and profile information in one
-                        validated workflow. Drafts are saved locally while you work.
+                        Try the form validation and document photo preview using fictional details.
+                    </p>
+                    <p className="demoNotice" role="note">
+                        Demo only: do not enter real personal or identity information. This page does not send or save form data, and it does not verify anyone’s identity.
                     </p>
                 </Styled.Intro>
                 <KycForm ref={kycRef} onSubmittingChange={setSubmitting} />

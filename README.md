@@ -2,16 +2,16 @@
 
 ![KYC Verification preview](screenshot.png)
 
-A responsive KYC verification workspace built with React. It collects applicant details, validates each section, previews a profile photo, and keeps text drafts available locally while the form is in progress.
+A responsive front-end demo of a KYC form workflow built with React. It demonstrates client-side validation and a profile photo preview only; it does not submit, save, or verify identity information. Use fictional details only.
 
 ## Features
 
 - Personal, address, document, and profile photo sections
 - React Hook Form and Yup validation
 - Dynamic document number label based on document type
-- Local draft save and restore
+- No browser draft storage or backend submission
 - Image preview and clear action
-- Verify, reset, delete, and toast feedback actions
+- Demo validation, reset, and toast feedback actions
 - Responsive fixed navigation, mobile menu, social sharing metadata, and go-to-top control
 
 ## Tech Stack
@@ -35,11 +35,15 @@ npm run build
 npm run preview
 ~~~
 
-Live URL: https://a2rp.github.io/kyc-verification/
+Live demo: https://a2rp.github.io/kyc-verification/
+
+Do not enter real personal or identity information. Form data stays in the current page state only. The demo does not transmit information or perform identity checks.
+
+For privacy, the app also removes the legacy `kyc_form_draft_v2` localStorage entry left by earlier versions when that entry exists.
 
 ## Future Direction
 
-The fake submission service can be replaced with a secure backend endpoint and real verification workflow.
+The current version has no backend. A real KYC service would need a secure server-side workflow, identity and consent notices, access controls, retention rules, and appropriate review before handling real applicant data.
 
 ## Links
 

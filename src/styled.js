@@ -126,6 +126,16 @@ const Intro = styled.section`
         color: var(--muted);
         line-height: 1.7;
     }
+
+    .demoNotice {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border: 1px solid rgba(251, 191, 36, 0.45);
+        border-radius: 10px;
+        background: rgba(120, 78, 14, 0.2);
+        color: #f5d58c;
+        font-size: 13px;
+    }
 `;
 
 const MobileOverlay = styled.button`

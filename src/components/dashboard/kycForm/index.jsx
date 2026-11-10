@@ -2,7 +2,6 @@ import {
     forwardRef,
     useImperativeHandle,
     useState,
-    useRef,
     useEffect,
     useMemo,
 } from "react";
@@ -50,12 +49,6 @@ const SectionTitle = styled.h2`
   }
 `;
 
-const Grid2 = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  @media (max-width: 820px) { grid-template-columns: 1fr; }
-`;
 const Grid3 = styled.div`
   display: grid;
   grid-template-columns: repeat(3, minmax(0,1fr));
@@ -81,21 +74,10 @@ const Output = styled.pre`
   border-radius:12px; color:var(--text); white-space:pre-wrap; word-break:break-word;
 `;
 
-const DRAFT_KEY = "kyc_form_draft_v2";
-
-const safeLoadDraft = () => {
-    try { return JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); }
-    catch { return null; }
-};
-const saveDraft = (values) => {
-    const rest = { ...values };
-    delete rest.profilePicture;
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(rest));
-};
-const clearDraft = () => localStorage.removeItem(DRAFT_KEY);
+const LEGACY_DRAFT_KEY = "kyc_form_draft_v2";
 
 const KycForm = forwardRef(function KycForm(
-    { onSubmittingChange, apiMode = "success" },
+    { onSubmittingChange },
     ref
 ) {
     const {
@@ -114,21 +96,15 @@ const KycForm = forwardRef(function KycForm(
     useEffect(() => { onSubmittingChange?.(isSubmitting); }, [isSubmitting, onSubmittingChange]);
 
     useEffect(() => {
-        const draft = safeLoadDraft();
-        if (draft) {
-            reset({ ...defaultValues, ...draft, profilePicture: null });
-            toast.info("Draft restored from device");
+        try {
+            if (localStorage.getItem(LEGACY_DRAFT_KEY) !== null) {
+                localStorage.removeItem(LEGACY_DRAFT_KEY);
+                toast.info("A previous local draft was cleared. This demo no longer saves applicant data.");
+            }
+        } catch {
+            // Browser storage may be disabled; the form works without it.
         }
-    }, [reset]);
-
-    const debounceRef = useRef(null);
-    useEffect(() => {
-        const sub = watch((vals) => {
-            clearTimeout(debounceRef.current);
-            debounceRef.current = setTimeout(() => saveDraft(vals), 400);
-        });
-        return () => { sub.unsubscribe(); clearTimeout(debounceRef.current); };
-    }, [watch]);
+    }, []);
 
     const docType = watch("documentType");
     const docNumberLabel = useMemo(() => {
@@ -140,47 +116,16 @@ const KycForm = forwardRef(function KycForm(
         }
     }, [docType]);
 
-    const fakeApi = () =>
-        new Promise((resolve, reject) => {
-            setTimeout(() => {
-                if (apiMode === "success") return resolve({ ok: true });
-                if (apiMode === "error") return reject(new Error("Server error"));
-                Math.random() < 0.85 ? resolve({ ok: true }) : reject(new Error("Server error"));
-            }, 600);
-        });
+    const [demoCompleted, setDemoCompleted] = useState(false);
 
-    const [submitted, setSubmitted] = useState(null);
-
-    const toFormData = (values) => {
-        const fd = new FormData();
-        Object.entries(values).forEach(([k, v]) => {
-            if (k === "profilePicture") {
-                if (v) fd.append("profilePicture", v, v.name);
-            } else fd.append(k, v ?? "");
-        });
-        return fd;
-    };
-
-    const onSubmit = async (values) => {
-        try {
-            toFormData(values);
-            await fakeApi();
-            toast.success("KYC submitted successfully.");
-            clearDraft();
-
-            const file = values.profilePicture
-                ? { name: values.profilePicture.name, size: values.profilePicture.size, type: values.profilePicture.type }
-                : null;
-            setSubmitted({ ...values, profilePicture: file });
-        } catch (e) {
-            toast.error(e?.message || "Submission failed");
-        }
+    const onSubmit = () => {
+        setDemoCompleted(true);
+        toast.info("Demo validation complete. No data was sent, saved, or verified.");
     };
 
     const onReset = () => {
         reset(defaultValues);
-        setSubmitted(null);
-        clearDraft();
+        setDemoCompleted(false);
         toast.info("Form cleared");
     };
 
@@ -384,10 +329,10 @@ const KycForm = forwardRef(function KycForm(
             </Card>
 
             {/* Debug output */}
-            {submitted && (
+            {demoCompleted && (
                 <Card>
-                    <SectionTitle>Submission Summary</SectionTitle>
-                    <Output>{JSON.stringify(submitted, null, 2)}</Output>
+                    <SectionTitle>Demo complete</SectionTitle>
+                    <Output>Browser-side validation passed. No applicant information was sent or saved, and no identity was verified.</Output>
                 </Card>
             )}
         </form>
